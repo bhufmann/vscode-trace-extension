@@ -33,7 +33,7 @@
         "command": "outputs.openOverview",
         "title": "Open Overview View",
         "icon": {
-          "light": "assets/media/graph-line-light.svg",
+          "light": "assets/media/graph-line.svg",
           "dark": "assets/media/graph-line.svg"
         }
       },
@@ -147,7 +147,7 @@
     "traceviewer-base": "next",
     "traceviewer-react-components": "next",
     "vsce": "^1.85.1",
-    "vscode-trace-common": "0.0.0"
+    "vscode-trace-webviews": "0.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.32.3",

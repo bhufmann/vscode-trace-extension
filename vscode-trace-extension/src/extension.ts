@@ -8,10 +8,12 @@ import { fileHandler, openOverviewHandler, resetZoomHandler } from './trace-expl
 import { TraceServerConnectionStatusService } from './utils/trace-server-status';
 import { updateTspClient } from './utils/tspClient';
 import { TraceExtensionLogger } from './utils/trace-extension-logger';
+import { ExecutionEvent } from 'traceviewer-base/lib/signals/execution-event';
 
 export let traceLogger: TraceExtensionLogger;
+export const commandHandlers: CommandHandler[] = [];
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext) {
     traceLogger = new TraceExtensionLogger('Trace Extension');
 
     const serverStatusBarItemPriority = 1;
@@ -65,6 +67,24 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand('openedTraces.openTraceFolder', () => {
         fileOpenHandler(context, undefined);
     }));
+
+    const api = {
+        // TODO register with command description with name, id, category
+        registerCommandHandler(commandHandler: CommandHandler): void {
+            commandHandlers.push(commandHandler);
+        },
+        deregisterCommandHandler(commandHandler: CommandHandler): void {
+            const index = commandHandlers.indexOf(commandHandler, 0);
+            if (index > -1) {
+                commandHandlers.splice(index, 1);
+            }
+        }
+    };
+    return api;
+}
+
+export interface CommandHandler {
+    commandHandler: (event: ExecutionEvent) => void;
 }
 
 export function deactivate(): void {

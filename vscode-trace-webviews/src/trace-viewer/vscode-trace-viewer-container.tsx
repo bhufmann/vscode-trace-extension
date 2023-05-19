@@ -16,6 +16,7 @@ import { TspClientProvider } from '../common/tsp-client-provider-impl';
 import { VsCodeMessageManager, VSCODE_MESSAGES } from 'vscode-trace-common/lib/messages/vscode-message-manager';
 import { convertSignalExperiment } from 'vscode-trace-common/lib/signals/vscode-signal-converter';
 import '../style/trace-viewer.css';
+import { ExecutionEvent } from 'traceviewer-base/lib/signals/execution-event';
 
 const JSONBig = JSONBigConfig({
     useNativeBigInt: true,
@@ -36,6 +37,8 @@ class TraceViewerContainer extends React.Component<{}, VscodeAppState>  {
 
   private _onProperties = (properties: { [key: string]: string }): void => this.doHandlePropertiesSignal(properties);
   private _onSaveAsCSV = (payload: {traceId: string, data: string}): void => this.doHandleSaveAsCSVSignal(payload);
+  private _onExecuteCommand = (payload: ExecutionEvent): void => this.doHandleExecuteCommand(payload);
+
   /** Signal Handlers */
   private doHandlePropertiesSignal(properties: { [key: string]: string }) {
       this._signalHandler.propertiesUpdated(properties);
@@ -43,6 +46,10 @@ class TraceViewerContainer extends React.Component<{}, VscodeAppState>  {
 
   private doHandleSaveAsCSVSignal(payload: {traceId: string, data: string}) {
       this._signalHandler.saveAsCSV(payload);
+  }
+
+  private doHandleExecuteCommand(event: ExecutionEvent) {
+      this._signalHandler.executeCommand(event);
   }
 
   // TODO add support for marker sets
@@ -114,12 +121,14 @@ class TraceViewerContainer extends React.Component<{}, VscodeAppState>  {
       this._signalHandler.notifyReady();
       signalManager().on(Signals.ITEM_PROPERTIES_UPDATED, this._onProperties);
       signalManager().on(Signals.SAVE_AS_CSV, this._onSaveAsCSV);
+      signalManager().on(Signals.EXECUTE_COMMAND, this._onExecuteCommand);
   }
 
   componentWillUnmount(): void {
       signalManager().off(Signals.ITEM_PROPERTIES_UPDATED, this._onProperties);
       signalManager().off(Signals.OVERVIEW_OUTPUT_SELECTED, this._onOverviewSelected);
       signalManager().off(Signals.SAVE_AS_CSV, this._onSaveAsCSV);
+      signalManager().off(Signals.EXECUTE_COMMAND, this._onExecuteCommand);
       window.removeEventListener('resize', this.onResize);
   }
 

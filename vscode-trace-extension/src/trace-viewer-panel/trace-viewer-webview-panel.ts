@@ -8,6 +8,7 @@ import { signalManager, Signals } from 'traceviewer-base/lib/signals/signal-mana
 import { VSCODE_MESSAGES } from 'vscode-trace-common/lib/messages/vscode-message-manager';
 import JSONBigConfig from 'json-bigint';
 import * as fs from 'fs';
+import { commandHandlers } from '../extension';
 
 const JSONBig = JSONBigConfig({
     useNativeBigInt: true,
@@ -182,6 +183,14 @@ export class TraceViewerPanel {
 	            if (message.data && message.data.status && this._statusService) {
 	                const status: boolean = JSON.parse(message.data.status);
 	                this._statusService.render(status);
+	            }
+	            return;
+	        case VSCODE_MESSAGES.EXECUTE_COMMAND:
+	            if (message.event) {
+	            	console.log('EXECUTE_COMMAND: ' + message.event.command);
+		            for (const element of commandHandlers) {
+	                    element.commandHandler(message.event);
+	                }
 	            }
 	            return;
 	        }

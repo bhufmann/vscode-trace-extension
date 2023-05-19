@@ -1,7 +1,8 @@
+import JSONBigConfig from 'json-bigint';
 import * as Messages from 'traceviewer-base/lib/message-manager';
 import { OutputAddedSignalPayload } from 'traceviewer-base/lib/signals/output-added-signal-payload';
+import { ExecutionEvent } from 'traceviewer-base/lib/signals/execution-event';
 import { Experiment } from 'tsp-typescript-client/lib/models/experiment';
-import JSONBigConfig from 'json-bigint';
 
 const JSONBig = JSONBigConfig({
     useNativeBigInt: true,
@@ -43,6 +44,7 @@ export const VSCODE_MESSAGES = {
     TRACE_VIEWER_TAB_ACTIVATED: 'traceViewerTabActivated',
     UPDATE_PROPERTIES: 'updateProperties',
     WEBVIEW_READY: 'webviewReady',
+    EXECUTE_COMMAND: 'executeCommand'
 };
 
 export class VsCodeMessageManager extends Messages.MessageManager {
@@ -108,5 +110,10 @@ export class VsCodeMessageManager extends Messages.MessageManager {
 
     saveAsCSV(payload: {traceId: string, data: string}): void {
         vscode.postMessage({command: VSCODE_MESSAGES.SAVE_AS_CSV, payload});
+    }
+
+    executeCommand(event: ExecutionEvent): void {
+        console.log('here: ' + event.command);
+        vscode.postMessage({command: VSCODE_MESSAGES.EXECUTE_COMMAND, event });
     }
 }
