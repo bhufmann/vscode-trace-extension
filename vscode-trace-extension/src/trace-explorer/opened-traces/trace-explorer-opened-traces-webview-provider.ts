@@ -42,6 +42,7 @@ export class TraceExplorerOpenedTracesViewProvider extends AbstractTraceExplorer
     protected doHandleTracesWidgetActivatedSignal(experiment: Experiment): void {
         if (this._view && experiment) {
             this._selectedExperiment = experiment;
+            console.log('>>> openedTracesView: doHandleTracesWidgetActivatedSignal: exp: ' + this._selectedExperiment?.name);
             const wrapper: string = JSONBig.stringify(experiment);
             this._view.webview.postMessage({ command: VSCODE_MESSAGES.TRACE_VIEWER_TAB_ACTIVATED, data: wrapper });
             signalManager().fireExperimentSelectedSignal(this._selectedExperiment);
@@ -51,6 +52,7 @@ export class TraceExplorerOpenedTracesViewProvider extends AbstractTraceExplorer
     protected doHandleExperimentSelectedSignal(experiment: Experiment | undefined): void {
         if (this._view) {
             this._selectedExperiment = experiment;
+            console.log('>>> openedTracesView: doHandleExperimentSelectedSignal: exp: ' + this._selectedExperiment?.name);
         }
     }
 
@@ -63,6 +65,7 @@ export class TraceExplorerOpenedTracesViewProvider extends AbstractTraceExplorer
             message => {
                 const command: string = message.command;
                 const data: any = message.data;
+                console.log('>>> openedTracesView: Signal received: ' + command + ', exp: ' + this._selectedExperiment?.name);
                 switch (command) {
                     case VSCODE_MESSAGES.CONNECTION_STATUS:
                         if (data?.status) {
@@ -113,8 +116,10 @@ export class TraceExplorerOpenedTracesViewProvider extends AbstractTraceExplorer
                         let experiment: Experiment | undefined;
                         if (data && data.wrapper) {
                             experiment = convertSignalExperiment(JSONBig.parse(data.wrapper));
+                            console.log('>>>: openedTracesView: Signal received: EXPERIMENT_SELECTED ' + experiment.name);
                         } else {
                             experiment = undefined;
+                            console.log('>>>: openedTracesView: Signal received: EXPERIMENT_SELECTED undefined');
                         }
                         signalManager().fireExperimentSelectedSignal(experiment);
                     }

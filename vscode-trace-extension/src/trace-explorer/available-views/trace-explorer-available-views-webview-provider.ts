@@ -37,6 +37,7 @@ export class TraceExplorerAvailableViewsProvider extends AbstractTraceExplorerPr
             message => {
                 const command: string = message.command;
                 const data: any = message.data;
+                console.log('>>> availableViews: Signal received: ' + command + ', exp: ' + this._selectedExperiment?.name);
                 switch (command) {
                     case VSCODE_MESSAGES.CONNECTION_STATUS:
                         if (data?.status) {
@@ -72,8 +73,10 @@ export class TraceExplorerAvailableViewsProvider extends AbstractTraceExplorerPr
                             if (data && data.wrapper) {
                                 // Avoid endless forwarding of signal
                                 this._selectedExperiment = convertSignalExperiment(JSONBig.parse(data.wrapper));
+                                console.log('>>>: availableViews: Signal received: EXPERIMENT_SELECTED ' + this._selectedExperiment?.name);
                             } else {
                                 this._selectedExperiment = undefined;
+                                console.log('>>>: availableViews: Signal received: EXPERIMENT_SELECTED (undefined)');
                             }
                             signalManager().fireExperimentSelectedSignal(this._selectedExperiment);
                         } finally {
@@ -98,6 +101,7 @@ export class TraceExplorerAvailableViewsProvider extends AbstractTraceExplorerPr
         this.doHandleExperimentSelectedSignal(experiment);
 
     protected doHandleExperimentSelectedSignal(experiment: Experiment | undefined): void {
+        console.log('>>>: availableViews: doHandleExperimentSelectedSignal ' + experiment?.name + '_selectionOngoing=' + this._selectionOngoing);
         if (!this._selectionOngoing && this._view) {
             this._selectedExperiment = experiment;
             const wrapper: string = JSONBig.stringify(experiment);
