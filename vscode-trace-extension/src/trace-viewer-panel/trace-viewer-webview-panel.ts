@@ -56,6 +56,8 @@ export class TraceViewerPanel {
     ): TraceViewerPanel {
         const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
+        console.log("createOrShow: " + name);
+
         // If we already have a panel, show it.
         // Otherwise, create a new panel.
         let openedPanel = TraceViewerPanel.activePanels[name];
@@ -201,6 +203,7 @@ export class TraceViewerPanel {
                 signalManager().fireCloseTraceViewerTabSignal(traceUUID);
             }
             if (isActivePanel) {
+                console.log('>>> panel: dispose: exp: ' + this._experiment?.name);
                 signalManager().fireExperimentSelectedSignal(undefined);
             }
             return this._disposables;
@@ -211,6 +214,7 @@ export class TraceViewerPanel {
                 TraceViewerPanel.currentPanel = this;
                 setStatusFromPanel(name);
                 if (this._experiment) {
+                    console.log('>>> panel: onDidChangeViewState: exp: ' + this._experiment?.name);
                     signalManager().fireTraceViewerTabActivatedSignal(this._experiment);
                     signalManager().fireExperimentSelectedSignal(this._experiment);
                 }
@@ -344,6 +348,7 @@ export class TraceViewerPanel {
 
     protected doHandleExperimentSelectedSignal(experiment: Experiment | undefined): void {
         if (this._experiment && experiment && this._experiment.UUID === experiment.UUID) {
+            console.log('>>> panel: doHandleExperimentSelectedSignal: exp: ' + this._experiment?.name);
             this._panel.reveal();
             const wrapper: string = JSONBig.stringify(experiment);
             this._panel.webview.postMessage({ command: VSCODE_MESSAGES.EXPERIMENT_SELECTED, data: wrapper });
@@ -361,10 +366,12 @@ export class TraceViewerPanel {
         });
     }
     setExperiment(experiment: Experiment): void {
+        console.log('>>> panel: setExperiment: exp (old): ' + this._experiment?.name);
         this._experiment = experiment;
         const wrapper: string = JSONBig.stringify(experiment);
         this._panel.webview.postMessage({ command: VSCODE_MESSAGES.SET_EXPERIMENT, data: wrapper });
         signalManager().fireExperimentOpenedSignal(experiment);
+        console.log('>>> panel: setExperiment: exp (new): ' + experiment?.name);
         signalManager().fireTraceViewerTabActivatedSignal(experiment);
     }
 
